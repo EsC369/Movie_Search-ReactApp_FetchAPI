@@ -15,7 +15,7 @@ export class MovieRow extends Component {
               </td>
               <td>
                 {this.props.movie.title}
-                <p>{this.props.movie.overviewreview}</p>
+                <p>{this.props.movie.overview}</p>
               </td>
             </tr>
           </tbody>

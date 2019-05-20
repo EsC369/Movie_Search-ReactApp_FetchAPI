@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import './App.css';
 // import MovieRow from "./components/MovieRow.js";
 
-const url = "http://api.themoviedb.org/3/search/movie?query=marvel&api_key=3edc78312597d701f2909d246b009cae"
+// const url = "http://api.themoviedb.org/3/search/movie?query=marvel&api_key=3edc78312597d701f2909d246b009cae"
+const posterBaseURL = "https://image.tmdb.org/t/p/w185"
 // works:   https://api.themoviedb.org/3/movie/550?api_key=3edc78312597d701f2909d246b009cae
 
 class App extends Component {
@@ -13,15 +14,16 @@ class App extends Component {
       movies: []
     }
     // Call api Search: 
-    this.performSearch()
+    this.performSearch("avengers")
   }
   // api call:
-  performSearch() {
+  performSearch(searchTerm) {
+    const url = `http://api.themoviedb.org/3/search/movie?query=${searchTerm}&api_key=3edc78312597d701f2909d246b009cae`
     console.log("Performing search using MovieDB")
     fetch(url)
       .then(response => response.json())
       .then(data => {
-        console.log(JSON.stringify(data));
+        // console.log(JSON.stringify(data.results[0].poster_path));
         this.setState({
           isLoaded: true,
           movies: data
@@ -30,10 +32,26 @@ class App extends Component {
       .catch(err => console.log("Error: ", err))
   }
 
+  searchHanlder(e) {
+    // e.preventDefault();
+    // console.log(e.target.value)
+    const searchTerm = e.target.value;
+    this.performSearch(searchTerm);
+  }
+
+  viewMovie(id) {
+    console.log("Trying to view movie of ID: ", id)
+    window.location.href = 'https://www.themoviedb.org/movie/' + id;
+  }
+
+
   render() {
-    var { movies, isLoaded } = this.state;
+    const { movies, isLoaded } = this.state;
+    
     if (isLoaded !== true) {
-      return <div>Loadidng...</div>
+      return (
+        <div>Loadidng...</div>
+        )
     } else {
       return (
         <div className="App">
@@ -44,24 +62,22 @@ class App extends Component {
             </tbody>
           </table>
           <center>
-            <input type="text" placeholder="Enter Search Term" className="inputSearch" name="inputSearch" />
+            <input onChange={this.searchHanlder.bind(this)} type="text" placeholder="Enter Search Term" className="inputSearch" name="inputSearch" />
           </center>
 
           <ul>
-            Result Below: <br />
-            <p>Title of first movie: {movies.results[0].title}</p>
-
-            <p>Attempt at iteration: </p>
             {movies.results.map(movie => (
               <table key={movie.id}>
+              <p>Movie id: {movie.id}</p>
                 <tbody>
                   <tr>
                     <td>
-                      <img src={movie.poster_path} width="120" alt="Movie Poster" className="moviePosters" />
+                      <img src={posterBaseURL + movie.poster_path} width="120" alt="Movie Poster" className="moviePosters" />
                     </td>
                     <td>
-                      {movie.title}
+                      <h3>{movie.title}</h3>
                       <p>{movie.overview}</p>
+                      <input onClick={this.viewMovie.bind(this, movie.id)} type="button" value="View" />
                     </td>
                   </tr>
                 </tbody>
